@@ -17,7 +17,7 @@ class ScorePage extends StatelessWidget {
               elevation: 0,
               backgroundColor: Colors.transparent,
             ),
-            body: Center(child: CircularProgressIndicator()), // Indicateur de chargement
+            body: Center(child: CircularProgressIndicator()),
           );
         } else if (snapshot.hasError) {
           return Scaffold(
@@ -25,9 +25,9 @@ class ScorePage extends StatelessWidget {
               elevation: 0,
               backgroundColor: Colors.transparent,
             ),
-            body: Center(child: Text('Erreur: ${snapshot.error}')), // Afficher l'erreur si la récupération échoue
+            body: Center(child: Text('Erreur: ${snapshot.error}')),
           );
-        } else {
+        } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
           // Afficher les données une fois qu'elles sont récupérées avec succès
           return Scaffold(
             appBar: AppBar(
@@ -37,7 +37,7 @@ class ScorePage extends StatelessWidget {
             backgroundColor: Colors.white,
             body: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.all(20.0),
+                padding: const EdgeInsets.all(8.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -53,7 +53,7 @@ class ScorePage extends StatelessWidget {
                         DataColumn(label: Text('%')),
                         DataColumn(label: Text('POINTS')),
                       ],
-                      rows: (snapshot.data as List<Score>).map((score) {
+                      rows: snapshot.data!.map((score) {
                         return DataRow(
                           cells: [
                             DataCell(Text(score.exam)),
@@ -69,6 +69,14 @@ class ScorePage extends StatelessWidget {
                 ),
               ),
             ),
+          );
+        } else {
+          return Scaffold(
+            appBar: AppBar(
+              elevation: 0,
+              backgroundColor: Colors.transparent,
+            ),
+            body: Center(child: Text('Aucun score trouvé')),
           );
         }
       },

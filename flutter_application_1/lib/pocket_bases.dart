@@ -4,39 +4,21 @@ import 'package:http/http.dart' as http;
 class DatabaseService {
   final String baseUrl = 'http://10.0.2.2:8090';
 
-  Future<UserData> getUserData(String userID) async {
-    final response = await http.get(Uri.parse('http://10.0.2.2:8090/api/collections/users/records/$userID'));
+  Future<List<Score>> getUserScores(String userId) async {
+    final response = await http.get(Uri.parse('$baseUrl/api/collections/scores/records?filter=(user_id="$userId")'));
 
-    if (response.statusCode == 200) {
-      return UserData.fromJson(jsonDecode(response.body));
-    } else {
-      throw Exception('Failed to load user data');
-    }
-  }
-
-  Future<List<Score>> getUserScores(String userID) async {
-    final response = await http.get(Uri.parse('$baseUrl/api/collections/scores/records?filter=(user_id="$userID")'));
+    print('Requête URL: ${response.request!.url}');
+    print('Code de réponse: ${response.statusCode}');
+    print('Corps de réponse: ${response.body}');
 
     if (response.statusCode == 200) {
       List jsonResponse = json.decode(response.body)['items'];
+      print('Scores récupérés: $jsonResponse'); // Débogage
       return jsonResponse.map((data) => Score.fromJson(data)).toList();
     } else {
+      print('Erreur lors de la récupération des scores: ${response.body}');
       throw Exception('Failed to load scores');
     }
-  }
-}
-
-class UserData {
-  final String name;
-  final String imageURL;
-
-  UserData({required this.name, required this.imageURL});
-
-  factory UserData.fromJson(Map<String, dynamic> json) {
-    return UserData(
-      name: json['name'],
-      imageURL: json['imageURL'],
-    );
   }
 }
 
