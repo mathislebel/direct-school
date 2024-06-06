@@ -14,45 +14,60 @@ class _WelcomePageState extends State<WelcomePage> {
   final TextEditingController _passwordController = TextEditingController();
 
   Future<void> _login() async {
-  String enteredUser = _userController.text;
-  String enteredPassword = _passwordController.text;
+    String enteredUser = _userController.text;
+    String enteredPassword = _passwordController.text;
 
-  print('Login button pressed');  // Debugging line
-  final response = await http.get(
-    Uri.parse('http://192.168.153.19:8090/api/collections/AUTH/records'),  // Replace with your machine's IP
-  );
+    print('Bouton de connexion appuyé');  // Ligne de débogage
 
-  print('Response status: ${response.statusCode}');  // Debugging line
-  print('Response body: ${response.body}');  // Debugging line
+    // Utilisez l'URL correcte de votre API qui renvoie des données JSON
+    final url = Uri.parse('http://10.0.2.2:8090/api/collections/AUTH/records');
+    print('URL de la requête: $url');
 
-  if (response.statusCode == 200) {
-    var jsonResponse = json.decode(response.body);
-    List<dynamic> records = jsonResponse['items']; // Ensure you are accessing the correct structure
+    // Ajoutez votre token d'authentification ici
+    String authToken = 'f50xjob4te7lgwm'; // Remplacez par votre token
 
-    for (var record in records) {
-      if (record['user'] == enteredUser && record['password'] == enteredPassword) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => UserPage(
-              userID: enteredUser,
-              imageURL: record['images'],  // Assuming 'images' is the key for the image URL
+    final response = await http.get(
+      url,
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $authToken',  // Ajoutez l'en-tête d'authentification si nécessaire
+      },
+    );
+
+    print('Statut de la réponse: ${response.statusCode}');  // Ligne de débogage
+    print('En-tête Content-Type: ${response.headers['content-type']}');  // Ligne de débogage
+    print('Corps de la réponse: ${response.body}');  // Ligne de débogage
+
+    if (response.statusCode == 200) {
+      var jsonResponse = json.decode(response.body);
+      List<dynamic> records = jsonResponse['items'];
+
+      for (var record in records) {
+        if (record['user'] == enteredUser && record['password'] == enteredPassword) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => UserPage(
+                userID: enteredUser,
+                imageURL: record['images'],
+              ),
             ),
-          ),
-        );
-        return;
+          );
+          return;
+        }
       }
+
+      // Afficher un message d'erreur si la connexion échoue
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Identifiants invalides'),
+      ));
+    } else {
+      // Afficher un message d'erreur en cas de problème de connexion
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Échec de la connexion: ${response.reasonPhrase}'),
+      ));
     }
-
-    // Show error message if login fails
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('Invalid credentials'),
-    ));
-  } else {
-    throw Exception('Failed to load records');
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +86,7 @@ class _WelcomePageState extends State<WelcomePage> {
                 controller: _userController,
                 style: TextStyle(color: Colors.black),
                 decoration: InputDecoration(
-                  hintText: 'User',
+                  hintText: 'Utilisateur',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -82,7 +97,7 @@ class _WelcomePageState extends State<WelcomePage> {
                 controller: _passwordController,
                 style: TextStyle(color: Colors.black),
                 decoration: InputDecoration(
-                  hintText: 'Password',
+                  hintText: 'Mot de passe',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -95,7 +110,7 @@ class _WelcomePageState extends State<WelcomePage> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     ElevatedButton(
-                      onPressed: _login,
+                      onPressed: _login, // Utilisation de _login sans fonction anonyme
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFF125432),
                         padding: EdgeInsets.symmetric(horizontal: 50),
@@ -104,7 +119,7 @@ class _WelcomePageState extends State<WelcomePage> {
                         ),
                       ),
                       child: Text(
-                        'Continue',
+                        'Continuer',
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
