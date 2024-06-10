@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_application_1/user_page.dart'; // Assurez-vous que vous importez bien UserNotesPage
-
+import 'package:flutter/material.dart'; // Assurez-vous que vous importez bien UserNotesPage
+import 'package:flutter_application_1/user_page.dart';
 
 import 'dataUser_service.dart';
 

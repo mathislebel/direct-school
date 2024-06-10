@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class UserNotesPage extends StatefulWidget {
-  final String userId;
+  final String userId; // Changer le nom de l'argument en userName
 
   const UserNotesPage({Key? key, required this.userId}) : super(key: key);
 
@@ -17,13 +17,20 @@ class _UserNotesPageState extends State<UserNotesPage> {
   @override
   void initState() {
     super.initState();
-    _fetchUserNotes();
+    _fetchUserNotes(widget.userId); // Passer le nom d'utilisateur à la fonction de récupération des notes
   }
 
-  Future<void> _fetchUserNotes() async {
+Future<void> _fetchUserNotes(String userName) async {
+    String userId = '';
+    if (userName == 'Séréna') {
+      userId = 'ecfzxynzeps73o9'; // Remplacer 'ID_de_Séréna' par l'ID réel de Séréna
+    } else if (userName == 'Mathis') {
+      userId = '3slmtp51i1pxug1'; // Remplacer 'ID_de_Mathis' par l'ID réel de Mathis
+    }
+
     try {
-      final notesUrl = Uri.parse('http://10.0.2.2:8090/api/collections/notes/records');
-      String authToken = 'f50xjob4te7lgwm'; 
+      final notesUrl = Uri.parse('http://10.0.2.2:8090/api/collections/notes/records?filter=user="$userId"');
+      String authToken = 'f50xjob4te7lgwm';
 
       final response = await http.get(
         notesUrl,
@@ -45,6 +52,9 @@ class _UserNotesPageState extends State<UserNotesPage> {
       }
     } catch (e) {
       print('Erreur lors de la récupération des données: $e');
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Erreur lors de la récupération des données'),
+      ));
     }
   }
 
@@ -68,7 +78,7 @@ class _UserNotesPageState extends State<UserNotesPage> {
                       Text('Exam: ${note['exam']}'),
                       Text('Date: ${note['date']}'),
                       Text('Activity: ${note['activity']}'),
-                      if (note.containsKey('percentage')) // Vérifie si la clé 'percentage' existe
+                      if (note.containsKey('percentage'))
                         Text('Percentage: ${note['percentage']}%'),
                       Text('Points: ${note['points']}'),
                       Text('Comment: ${note['comment']}'),

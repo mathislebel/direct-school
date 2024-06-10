@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/user_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'user_page.dart'; // Assurez-vous d'importer la nouvelle page
+ // Assurez-vous d'importer la nouvelle page
 
 class NotesPage extends StatefulWidget {
-  const NotesPage({Key? key});
+  const NotesPage({Key? key}) : super(key: key);
 
   @override
   State<NotesPage> createState() => _NotesPageState();
@@ -94,7 +95,7 @@ class _NotesPageState extends State<NotesPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => UserNotesPage(userId: selectedUser!),
+        builder: (context) => UserNotesPage(userId: selectedUser!), // Utilise selectedUser correctement
       ),
     );
   }
