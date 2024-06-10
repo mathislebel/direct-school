@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'userpage.dart';
+import 'adminpage.dart'; // Assurez-vous d'importer votre page admin
 import 'widget/DelayAnimation.dart';
 
 class WelcomePage extends StatefulWidget {
@@ -20,26 +21,35 @@ class _WelcomePageState extends State<WelcomePage> {
     print('Bouton de connexion appuyé');  // Ligne de débogage
 
     // Utilisez l'URL correcte de votre API qui renvoie des données JSON
-    final url = Uri.parse('http://10.0.2.2:8090/api/collections/AUTH/records');
-    print('URL de la requête: $url');
+    final userUrl = Uri.parse('http://10.0.2.2:8090/api/collections/AUTH_user/records');
+    final adminUrl = Uri.parse('http://10.0.2.2:8090/api/collections/AUTH_admin/records');
+    print('URL de la requête (user): $userUrl');
+    print('URL de la requête (admin): $adminUrl');
 
     // Ajoutez votre token d'authentification ici
     String authToken = 'f50xjob4te7lgwm'; // Remplacez par votre token
 
-    final response = await http.get(
-      url,
+    final userResponse = await http.get(
+      userUrl,
       headers: {
         'Accept': 'application/json',
         'Authorization': 'Bearer $authToken',  // Ajoutez l'en-tête d'authentification si nécessaire
       },
     );
 
-    print('Statut de la réponse: ${response.statusCode}');  // Ligne de débogage
-    print('En-tête Content-Type: ${response.headers['content-type']}');  // Ligne de débogage
-    print('Corps de la réponse: ${response.body}');  // Ligne de débogage
+    final adminResponse = await http.get(
+      adminUrl,
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $authToken',  // Ajoutez l'en-tête d'authentification si nécessaire
+      },
+    );
 
-    if (response.statusCode == 200) {
-      var jsonResponse = json.decode(response.body);
+    print('Statut de la réponse (user): ${userResponse.statusCode}');  // Ligne de débogage
+    print('Statut de la réponse (admin): ${adminResponse.statusCode}');  // Ligne de débogage
+
+    if (userResponse.statusCode == 200) {
+      var jsonResponse = json.decode(userResponse.body);
       List<dynamic> records = jsonResponse['items'];
 
       for (var record in records) {
@@ -56,17 +66,31 @@ class _WelcomePageState extends State<WelcomePage> {
           return;
         }
       }
-
-      // Afficher un message d'erreur si la connexion échoue
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Identifiants invalides'),
-      ));
-    } else {
-      // Afficher un message d'erreur en cas de problème de connexion
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Échec de la connexion: ${response.reasonPhrase}'),
-      ));
     }
+
+    if (adminResponse.statusCode == 200) {
+      var jsonResponse = json.decode(adminResponse.body);
+      List<dynamic> records = jsonResponse['items'];
+
+      for (var record in records) {
+        if (record['user'] == enteredUser && record['password'] == enteredPassword) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AdminPage(
+                userID: enteredUser,
+              ),
+            ),
+          );
+          return;
+        }
+      }
+    }
+
+    // Afficher un message d'erreur si la connexion échoue
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Identifiants invalides'),
+    ));
   }
 
   @override

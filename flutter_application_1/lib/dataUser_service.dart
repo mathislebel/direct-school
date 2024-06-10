@@ -1,9 +1,9 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class DatabaseService {
+class DataUserService {
   Future<UserData> getUserData(String userID) async {
-    final url = Uri.parse('http://10.0.2.2:8090/api/collections/AUTH/records?filter=user="$userID"');
+    final url = Uri.parse('http://10.0.2.2:8090/api/collections/AUTH_user/records?filter=user="$userID"');
     final response = await http.get(url, headers: {'Accept': 'application/json'});
 
     if (response.statusCode == 200) {
@@ -103,6 +103,8 @@ class UserData {
   final String imageURL;
 
   UserData({required this.name, required this.imageURL});
+
+ 
 }
 
 
