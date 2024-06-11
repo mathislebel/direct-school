@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'agendapage.dart';
-import 'notespage.dart'; // Assurez-vous que le fichier notes_page.dart existe et est correctement importé
+import 'notespage.dart';
 
 class AdminPage extends StatelessWidget {
   final String userID;
@@ -55,6 +56,33 @@ class _CreateEventFormState extends State<CreateEventForm> {
   final TextEditingController _startTimeController = TextEditingController();
   final TextEditingController _endTimeController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null)
+      setState(() {
+        _dateController.text = "${picked.toLocal()}".split(' ')[0];
+      });
+  }
+
+  Future<void> _selectTime(BuildContext context, TextEditingController controller) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null)
+      setState(() {
+        final now = DateTime.now();
+        final dt = DateTime(now.year, now.month, now.day, picked.hour, picked.minute);
+        final format = MaterialLocalizations.of(context).formatTimeOfDay(picked);
+        controller.text = DateFormat('HH:mm').format(dt);
+      });
+  }
 
   void _createEvent() async {
     try {
@@ -119,17 +147,32 @@ class _CreateEventFormState extends State<CreateEventForm> {
           controller: _descriptionController,
           decoration: InputDecoration(labelText: 'Description'),
         ),
-        TextField(
-          controller: _dateController,
-          decoration: InputDecoration(labelText: 'Date'),
+        GestureDetector(
+          onTap: () => _selectDate(context),
+          child: AbsorbPointer(
+            child: TextField(
+              controller: _dateController,
+              decoration: InputDecoration(labelText: 'Date'),
+            ),
+          ),
         ),
-        TextField(
-          controller: _startTimeController,
-          decoration: InputDecoration(labelText: 'Heure de début'),
+        GestureDetector(
+          onTap: () => _selectTime(context, _startTimeController),
+          child: AbsorbPointer(
+            child: TextField(
+              controller: _startTimeController,
+              decoration: InputDecoration(labelText: 'Heure de début'),
+            ),
+          ),
         ),
-        TextField(
-          controller: _endTimeController,
-          decoration: InputDecoration(labelText: 'Heure de fin'),
+        GestureDetector(
+          onTap: () => _selectTime(context, _endTimeController),
+          child: AbsorbPointer(
+            child: TextField(
+              controller: _endTimeController,
+              decoration: InputDecoration(labelText: 'Heure de fin'),
+            ),
+          ),
         ),
         TextField(
           controller: _locationController,
