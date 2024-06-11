@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart'; // Assurez-vous que vous importez bien UserNotesPage
+import 'package:flutter_application_1/agendaPage.dart';
 import 'package:flutter_application_1/user_page.dart';
 
 import 'dataUser_service.dart';
@@ -75,7 +76,12 @@ class UserPage extends StatelessWidget {
                         );
                       },
                       child: Text('Scores'),
+                      
                     ),
+                    SizedBox(height: 20.0,),
+                    ElevatedButton(onPressed: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => AgendaPage()));
+                    }, child: Text('agenda'))
                   ],
                 ),
               ),
